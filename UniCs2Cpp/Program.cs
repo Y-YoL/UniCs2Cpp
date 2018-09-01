@@ -162,6 +162,55 @@ namespace UniCs2Cpp
             }
         }
 
+        private static string GetUnityPath()
+        {
+#if NET46
+            try
+            {
+                var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Unity Technologies\Installer\Unity");
+                var unityLocation = (string)key.GetValue(@"Location x64");
+                var path = Path.Combine(unityLocation, @"Editor\Unity.exe");
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+            catch (Exception)
+            {
+            }
+#endif
+
+            // デフォルトのインストール先と思われるパスを調べてみる
+            try
+            {
+                var path = Path.Combine(Environment.GetEnvironmentVariable(@"ProgramFiles"), @"Unity\Editor\Unity.exe");
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            // Unity Hubのデフォルトインストール先と思われるパスを調べてみる
+            try
+            {
+                var editor = Path.Combine(Environment.GetEnvironmentVariable(@"ProgramFiles"), @"Unity\Hub\Editor");
+                var unityLocation = Directory.EnumerateDirectories(editor).First();
+                var path = Path.Combine(unityLocation, @"Editor\Unity.exe");
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+            }
+            catch (Exception)
+            {
+            }
+
+            throw new InvalidOperationException(@"Unity.exe is not found.");
+        }
+
         private static int ExecuteUnity(string work)
         {
 #if NET46
@@ -178,7 +227,7 @@ namespace UniCs2Cpp
             {
                 StartInfo = new ProcessStartInfo()
                 {
-                    FileName = @"C:\Program Files\Unity\Hub\Editor\2018.1.9f1\Editor\Unity.exe",
+                    FileName = GetUnityPath(),
                     Arguments = $"-batchmode -nographics -quit -projectPath \"{Path.Combine(work, ProjectName)}\" -executeMethod {"BuildUtils.BuildTool.Build"} --BuildTarget Android --ApplicationIdentifier com.yol.unics2cpp --ScriptingBackend IL2CPP -logFile \"{Path.Combine(work, "batch.log")}\"",
                 }
             };
