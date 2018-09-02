@@ -14,3 +14,5 @@ install:
 
 before_build:
   - dotnet restore
+  - ps: Copy-Item -Path "${env:ProgramFiles}\Unity\Editor\Data\Managed\UnityEngine.dll" -Destination "BuildUtils\Unity\UnityEngine.dll"
+  - ps: Copy-Item -Path "${env:ProgramFiles}\Unity\Editor\Data\Managed\UnityEditor.dll" -Destination "BuildUtils\Unity\UnityEditor.dll"
