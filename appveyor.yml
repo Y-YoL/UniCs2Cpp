@@ -11,3 +11,6 @@ build:
 
 install:
   - cinst unity --version 2017.4.1
+
+before_build:
+  - nuget restore
