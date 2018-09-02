@@ -1,0 +1,18 @@
+version: 1.0.{build}
+pull_requests:
+  do_not_increment_build_number: true
+skip_tags: true
+skip_branch_with_pr: true
+image: Visual Studio 2017
+shallow_clone: true
+
+build:
+  verbosity: minimal
+
+install:
+  - cinst unity --version 2017.4.1
+
+before_build:
+  - dotnet restore
+  - ps: Copy-Item -Path "${env:ProgramFiles}\Unity\Editor\Data\Managed\UnityEngine.dll" -Destination "BuildUtils\Unity\UnityEngine.dll"
+  - ps: Copy-Item -Path "${env:ProgramFiles}\Unity\Editor\Data\Managed\UnityEditor.dll" -Destination "BuildUtils\Unity\UnityEditor.dll"
